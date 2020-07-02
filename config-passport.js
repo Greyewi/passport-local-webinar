@@ -1,5 +1,6 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 const userDB = {
   id: 136345,
@@ -29,5 +30,16 @@ passport.use(
     } else {
       return done(null, false);
     }
-  })
+  }),
+  new GoogleStrategy({
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL: "localhost:3000/auth/google/callback"
+    },
+    function(accessToken, refreshToken, profile, done) {
+      User.findOrCreate({ googleId: profile.id }, function (err, user) {
+        return done(err, user);
+      });
+    }
+  )
 );
